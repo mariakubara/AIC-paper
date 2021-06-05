@@ -1,3 +1,4 @@
+# Simulation of type B
 
 # Uniform distribution, all from 'agriculture' sector
 numObs<-c(200,500,1000)
@@ -118,7 +119,7 @@ for(n in 1:3){
     resultsMat<-rbind(resultsMat, other.sdm)
     
     # saving the results
-    write.table(resultsMat, file="simulationUniform.csv", row.names = F, col.names = T)
+    write.table(resultsMat, file="results_additional/simulationUniform.csv", row.names = F, col.names = T)
     
   }
 }

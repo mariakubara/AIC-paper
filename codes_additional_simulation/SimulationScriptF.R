@@ -1,3 +1,4 @@
+# Simulation of type F 
 
 # Cluster 'service' 75% per 25 observations, clusters per 25 observations 'construction' 25%
 
@@ -195,7 +196,7 @@ for(n in 1:3){
     resultsMat<-rbind(resultsMat, other.sdm)
     
     # saving the results
-    write.table(resultsMat, file="TwoCluster25.csv", row.names = F, col.names = T)
+    write.table(resultsMat, file="results_additional/TwoCluster25.csv", row.names = F, col.names = T)
     
   }
 }

@@ -1,3 +1,4 @@
+# Simulation of type A
 
 # Clusters with 20 observations each, all from 'service' sector
 
@@ -146,7 +147,7 @@ for(n in 1:3){
     resultsMat<-rbind(resultsMat, other.sdm)
     
     # saving the results
-    write.table(resultsMat, file="simulationCluster.csv", row.names = F, col.names = T)
+    write.table(resultsMat, file="results_simulations/simulationCluster.csv", row.names = F, col.names = T)
     
   }
 }

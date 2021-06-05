@@ -1,3 +1,4 @@
+# Simulation of type D
 
 # Uniform 'agriculture' 50%, uniform 'construction' 25%, clusters per 25 obs each 'service' 25%
 
@@ -202,7 +203,7 @@ for(n in 1:3){
     resultsMat<-rbind(resultsMat, other.sdm)
     
     # saving the results
-    write.table(resultsMat, file="simulationTwoUniformCluster25.csv", row.names = F, col.names = T)
+    write.table(resultsMat, file="results_additional/simulationTwoUniformCluster25.csv", row.names = F, col.names = T)
     
   }
 }
