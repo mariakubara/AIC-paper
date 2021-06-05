@@ -1,13 +1,15 @@
+#loading our self-defined function code
+source("codes_main_paper/semiVarianceKnn.R")
 
-source("semiVarianceKnn.R")
-
+#setting the range of knn to be tested (2:maxKnn)
 maxKnn <- 50
+
+# preparing for the loop which will caluclate semivariance for the 
+# initial simulation with clusters (with 20 observations each) in three sample sizes
 
 numObs<-list(c(10,20),c(25,20),c(50,20))
 
-############## Set with concentrations, 20 points in each cluster ######################
-
-resultsMat<-matrix(0, nrow=1, ncol=50) 
+resultsMat<-matrix(0, nrow=1, ncol=maxKnn) 
 
 # vector with seeds that will be used to ensure replicability of a simulation
 seed<-seq(1,1000,50)
@@ -16,6 +18,8 @@ for(n in 1:3){
   for(s in 1:20){ 
     # setting the seed for reproducibility 
     set.seed(seed[s])
+    
+    ### STEP 1 - generate the data structure (recognisable by our self-defined semi-variance function)
     
     ################# Generating random points (centroids for clusters) ###################
     uniformSet <- runifpoint(numObs[[n]][1], win=W, giveup=1000, nsim=1, drop=TRUE, ex=NULL)
@@ -60,7 +64,7 @@ for(n in 1:3){
     powLub <- inside.owin(pointsMat.sp@coords[,1], pointsMat.sp@coords[,2], W.lub)
     
     # change projection and create Spatial Points dataset
-    pointsMat.sp<-spTransform(pointsMat.sp, CRS("+proj=longlat +datum=NAD83")) #sferyczne
+    pointsMat.sp<-spTransform(pointsMat.sp, CRS("+proj=longlat +datum=NAD83")) 
     
     # creating a data frame with simulated companies characteristics
     data1<-cbind(pointsMat.sp@coords, powLub)
@@ -102,8 +106,12 @@ for(n in 1:3){
     
     crds<-as.matrix(cbind(datax$x, datax$y))
     
+    ### STEP 2 - calculate semivariance for the data structure with specific 
+    # coordinates, dependent variable and maximum Knn (range of knn 2:maxKnn)
+    
     resul <- semiVarKnn(crds,datax$roa,maxKnn)
     
+    # write results to the output file
     resultsMat<-rbind(resultsMat, resul)
     write.table(resultsMat, file="semiVarianceClusters.csv", row.names = F, col.names = T)
     

@@ -9,7 +9,7 @@ library(spatialreg)
 ###################### Preparing raw data for the loop ######################
 
 # loading company data
-firms<-read.csv("dane/geoloc data.csv", header=TRUE, dec=",", sep=";")
+firms<-read.csv("data/geoloc data.csv", header=TRUE, dec=",", sep=";")
 
 # adding parameters – individual sectors
 param<-data.frame(SEK_PKD7=c("A", "B", "C", "D" ,"E", "F", "G", "H", "I", "J", "K" ,"L", "M", "N", "O", "P", "Q", "R", "S"), SEK_agg=c("agri", "prod", "prod", "prod" ,"prod", "constr", "serv", "serv", "serv", "serv", "serv" ,"serv", "serv", "serv", "serv", "serv", "serv", "serv", "serv"), roa_ind=c(2,2.5,3,3.5,4,4.5,5,5.5,6,6.5,7,7.5,8,8.5,9,9.5,10,10.5,11))

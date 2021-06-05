@@ -1,4 +1,17 @@
 
+# Set of functions which are necessary to generate 
+# semiVariance results for incremental knn
+
+# gamma and semiVar are support functions, while semiVarKnn
+# is the main function which allows to generate semiVariance results for
+# data structure prepared in a following form:
+# coordinates (x,y), dependent variable (assigned to each coordinate pair),
+# and maxKnn which sets the range for semiVariance testing (k from 2 to maxKnn)
+
+# semiVarKnn returns a vector in which semiVariance values are provided for
+# each knn, knn=1 is set to zero and actualy calculated values start with knn=2 
+# up to the last element of the vector which shows semiVariance for knn=maxKnn
+
 gamma <- function(dataVect){
   n <- length(dataVect)
   gammaMat <- matrix(0, n, n)
@@ -28,28 +41,10 @@ semiVar <- function(allGamma, binary){
   return(semi)
 }
 
-points<-read.csv("C:\\Users\\maria\\Desktop\\teaching\\data\\support_centres.csv")
-points
-crds<-cbind(points$lat,points$long)
-crds
-
-i<-5
-library(spdep)
-pkt.knn<-knearneigh(crds, k=i, longlat = NULL) # układ planarny, knn=zalezne
-
-pkt.k.nb<-knn2nb(pkt.knn)
-pkt.knn.mat <-nb2mat(pkt.k.nb)
-binary <- pkt.knn.mat*i
-binary
-pkt.k.sym.nb<-make.sym.nb(pkt.k.nb) # usymetrycznienie macierzy
-pkt.k.sym.listw<-nb2listw(pkt.k.sym.nb)
-
-nrow(crds)
-z<- runif(37)*20
 
 semiVarKnn <- function(crds,z,maxKnn){
 
-  #do gamma for z
+  #do gamma for z values (dependent variable)
   allGamma <- gamma(z)
   
   semiKnn <- rep(0,maxKnn)
@@ -57,12 +52,12 @@ semiVarKnn <- function(crds,z,maxKnn){
   #iterate through knn
   for (i in 2:maxKnn){
     
-    pkt.knn<-knearneigh(crds, k=i, longlat = NULL) # układ planarny, knn=zalezne
+    pkt.knn<-knearneigh(crds, k=i, longlat = NULL) # planar coordinates, knn dependent
     
     pkt.k.nb<-knn2nb(pkt.knn)
     pkt.knn.mat <-nb2mat(pkt.k.nb)
     binary <- pkt.knn.mat*i
-    binary
+    #binary
     
     semiK <- semiVar(allGamma,binary)
     
@@ -70,9 +65,7 @@ semiVarKnn <- function(crds,z,maxKnn){
   
   }
   
-  plot(2:maxKnn, semiKnn[2:maxKnn])
+  #plot(2:maxKnn, semiKnn[2:maxKnn])
   
   return(semiKnn)
 }
-
-g<- semiVarKnn(crds, z, 10)
