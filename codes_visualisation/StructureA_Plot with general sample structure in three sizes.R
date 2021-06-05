@@ -1,12 +1,9 @@
 library(tidyverse)
 
-
-
 # Generating datasets
 
 # setting the seed for reproducibility 
 set.seed(601) 
-#set.seed(12345678)
 
 datax <- matrix(NA, ncol =15)
 colnames(datax) <- c("xi", "yi", "powLub", "roa_geo", "sector", "roa_sec","dist", "roa_dist" ,
@@ -71,7 +68,7 @@ for(n in 1:3){
   powLub <- inside.owin(pointsMat.sp@coords[,1], pointsMat.sp@coords[,2], W.lub)
   
   # change projection and create Spatial Points dataset
-  pointsMat.sp<-spTransform(pointsMat.sp, CRS("+proj=longlat +datum=NAD83")) #sferyczne
+  pointsMat.sp<-spTransform(pointsMat.sp, CRS("+proj=longlat +datum=NAD83")) 
   
   # creating a data frame with simulated companies characteristics
   data1<-cbind(pointsMat.sp@coords, powLub)
@@ -117,18 +114,7 @@ for(n in 1:3){
 
 datax2 <- datax[-1,]  
 
-library(tidyverse)
-library(sf)
-library(osmdata)
-
-
 datax.sf <- st_as_sf(datax2, coords = c("xi", "yi"), crs = "+proj=longlat +datum=NAD83")
-
-woj.sf <- st_read("dane/wojewodztwa.shp")
-woj.sf <- st_transform(woj.sf, crs = "+proj=longlat +datum=NAD83")
-
-# limit to lubelskie
-lub.woj.sf <- woj.sf %>% filter(jpt_nazwa_=='lubelskie') 
 
 sampleLabs <- c("200 points", "500 points", "1000 points")
 names(sampleLabs) <- c(200, 500, 1000)
@@ -145,10 +131,3 @@ ggplot() +
         strip.text.x = element_text(size = 12))
 
 # export for 950 width, 400 height
-
-# ggsave("Figure2 distribution of points.png",
-#   plot = last_plot(),
-#   width = 950,
-#   height = 400,
-#   dpi = 300
-# )

@@ -76,7 +76,7 @@ for(n in 1:3){
   powLub <- inside.owin(pointsMat2.sp@coords[,1], pointsMat2.sp@coords[,2], W.lub)
   
   # change projection and create Spatial Points dataset
-  pointsMat2.sp<-spTransform(pointsMat2.sp, CRS("+proj=longlat +datum=NAD83")) #sferyczne
+  pointsMat2.sp<-spTransform(pointsMat2.sp, CRS("+proj=longlat +datum=NAD83")) 
   
   # creating a data frame with simulated companies characteristics
   data2<-cbind(pointsMat2.sp@coords, powLub)
@@ -155,18 +155,7 @@ for(n in 1:3){
 
 datax2 <- datax[-1,]  
 
-library(tidyverse)
-library(sf)
-library(osmdata)
-
-
 datax.sf <- st_as_sf(datax2, coords = c("xi", "yi"), crs = "+proj=longlat +datum=NAD83")
-
-woj.sf <- st_read("dane/wojewodztwa.shp")
-woj.sf <- st_transform(woj.sf, crs = "+proj=longlat +datum=NAD83")
-
-# limit to lubelskie
-lub.woj.sf <- woj.sf %>% filter(jpt_nazwa_=='lubelskie') 
 
 sampleLabs <- c("200 points", "500 points", "1000 points")
 names(sampleLabs) <- c(200, 500, 1000)
