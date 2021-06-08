@@ -113,7 +113,7 @@ for(n in 1:3){
     
     # write results to the output file
     resultsMat<-rbind(resultsMat, resul)
-    write.table(resultsMat, file="results_simulations/semiVarianceClusters.csv", row.names = F, col.names = T)
+    write.table(resultsMat, file="results_simulations/semiVarianceClusters2.csv", row.names = F, col.names = T)
     
   }
 }
