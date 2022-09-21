@@ -1,21 +1,49 @@
 library(tidyverse)
 library(viridis)
 
+
+
+### Preparation code #########################################################
+
 # read the file with simulation results you are interested in plotting
 AICall <- read.csv(file="results_simulations/simulationCluster.csv", sep =" ")
-#AICall <- read.csv(file="results_additional/TwoCluster25.csv", sep =" ")
 
 # specify the title of plots (with respect to the simulation type you've chosen)
 titleOfPlots <- ""
 #titleOfPlots <- "Type F"
 
+
+
+### FIG 1 ####################################################################
+library(plot.matrix)
+
+teoret<-matrix(0, nrow=50, ncol=50)
+
+for(i in 1:50){
+  for(j in 1:50){
+    teoret[i,j]<-ifelse(i<j,(i/j)^0.5, NA)
+  }}
+
+par(mar=c(5,5,5,5))
+plot(teoret, main="Expected (theoretical) correlation between spatial lags 
+     for different knn (used in W)", xlab="knn in W1", ylab="knn in W2")
+
+
+
 ### FIG 2 ####################################################################
 
-# simulation design - small sample, middle size sample, big sample, colored by roa
-# code stored in the "StructureX_Plot with general sample structure in three sizes.R" files
+# Flowchart prepared in Canva software
+
 
 
 ### FIG 3 ####################################################################
+
+# simulation design - small sample, middle size sample, big sample, colored by roa
+# code stored in the "Structure_Spatial_Plot with general sample structure in three sizes.R" file
+
+
+
+### FIG 4 ####################################################################
 
 # Nominal (raw) values of AIC due to incremental increase of knn in W
 # y = AIC, x = knn, small medium big sample
@@ -39,7 +67,7 @@ ggplot(data = AICall, aes(x = knn, y=AIC, group = seed)) + geom_line(aes(color =
 #export 1250, 300
 
 
-### FIG 4 ####################################################################
+### FIG 5 ####################################################################
 
 # Relative values of AIC against relative values of knn
 # AIC standarized (to 0-1 scale) on y, on x - rank, where AIC reaches minimum =0, and then consecutive +1
@@ -77,7 +105,7 @@ ggplot(data = dataRank, aes(x = rank, y=AICrel, group = seed)) + geom_point(aes(
 ### export 950, 400
 
 
-### FIG 5 ####################################################################
+### FIG 6 ####################################################################
 
 # Values of relative rho (rho/rho(minAIC)) against relative knn (knn=0 for minAIC)
 
@@ -116,7 +144,48 @@ ggplot(data = dataRank2, aes(x = rank, y=rho.rel, group = seed)) + geom_point(ae
 
 #export 950, 400
 
-### FIG 6 ####################################################################
+
+
+### FIG 7 ####################################################################
+
+# Values of relative total impact (total/total(minAIC)) against relative knn (knn=0 for minAIC)
+
+data01 <- AICall %>% group_by(obsSample, seed) %>% summarise(AICmin = min(AIC), AICmax = max(AIC))
+data01
+
+#standarizing AIC to 0-1 interval 
+# (AIC-AICmin)/(AICmax-AICmin)
+data02 <- merge(AICall, data01) %>% mutate(AICrel = (AIC - AICmin)/(AICmax -AICmin)) %>% arrange(run)
+data02
+
+
+dataxx <- cbind(data02$knn, data02$AIC, data02$AICrel, data02$total, data02$obsSample, data02$run, data02$seed)
+colnames(dataxx) <- c('knn', 'AIC',  'AICrel', 'total', 'n', 'run', 'seed')
+dataxx <- as.data.frame(dataxx)
+summary(dataxx)
+
+
+dataRank <- dataxx %>% group_by(run) %>% mutate(rank = row_number() - which.min(AIC))
+
+
+minTotalByRank <- dataRank %>% group_by(run) %>% mutate(total.minAIC = ifelse(rank==0, total, 0)) %>% 
+  summarise(run = mean(run), total.min.AIC = sum(total.minAIC))
+
+dataRank2 <- merge(dataRank, minTotalByRank)  %>% mutate(total.rel = total/total.min.AIC) %>% arrange(run)
+
+
+ggplot(data = dataRank2, aes(x = rank, y=total.rel, group = seed)) + geom_point(aes(color = seed))+
+  facet_wrap(~n, scales = "free",  labeller = labeller(n = sampleLabs))+
+  scale_color_viridis_c()+
+  labs(colour="seed", y = 'total/total(minAIC)', x = 'knn.rel', title = paste0(titleOfPlots, " total impact (dist)"))+
+  theme_minimal()+
+  theme(panel.spacing = unit(2, "lines"), 
+        strip.text.x = element_text(size = 12))
+
+#export 950, 400
+
+
+### FIG 8 ####################################################################
 
 # Moran for dependent variable with regard to incremental increasing knn
 
@@ -138,7 +207,7 @@ ggplot(data = AICall, aes(x = knn, y=moran, group = seed)) + geom_line(aes(color
 
 
 
-### FIG 7 ####################################################################
+### FIG 9 ####################################################################
 
 # Variogram-like statistic against knn 
 
@@ -180,7 +249,7 @@ ggplot(data = dane, aes(x = knn, y=semiVar, group = seed)) + geom_line(aes(color
 #export 950, 400
 
 
-### FIG 8 ####################################################################
+### FIG 10 ####################################################################
 
 # Empirical data sample, size 200, 500, 1000 and 10k
 # AIC vs knn

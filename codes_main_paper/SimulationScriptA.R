@@ -7,8 +7,9 @@ numObs<-list(c(10,20),c(25,20),c(50,20))
 ############## Set with concentrations, 20 points in each cluster ######################
 
 # creating the structure of results matrix
-resultsMat<-matrix(0, nrow=1, ncol=8) 
-colnames(resultsMat)<-c('AIC', 'BIC', 'time', 'rho', 'knn', 'obsSample', 'seed', 'moran')
+resultsMat<-matrix(0, nrow=1, ncol=14) 
+colnames(resultsMat)<-c('AIC', 'BIC', 'time', 'rho', 'knn', 'obsSample', 'seed', 'moran', 
+                        "direct", "indirect", "total", "AICsem", "BICsem", "lambda")
 
 # vector with seeds that will be used to ensure replicability of a simulation
 seed<-seq(1,1000,50) 
@@ -108,8 +109,9 @@ for(n in 1:3){
     n.knn<-49 # range of knn [2:50], n.knn+1
     
     # partial results table to be filled during the loop iterations
-    other.sdm<-matrix(0, nrow=n.knn, ncol=8) 
-    colnames(other.sdm)<-c('AIC', 'BIC', 'time', 'rho', 'knn', 'obsSample', 'seed', 'moran')
+    other.sdm<-matrix(0, nrow=n.knn, ncol=14) 
+    colnames(other.sdm)<-c('AIC', 'BIC', 'time', 'rho', 'knn', 'obsSample', 'seed', 'moran', 
+                           "direct", "indirect", "total", "AICsem", "BICsem", "lambda")
     
     
     for(i in 1:n.knn){ 
@@ -132,6 +134,15 @@ for(n in 1:3){
       end.time <- Sys.time()
       time.sdm<- difftime(end.time, start.time, units="secs")
       
+      #calculating impacts
+      W.c <- as(as_dgRMatrix_listw(pkt.k.sym.listw), "CsparseMatrix")
+      trMat <- trW(W.c, type = "mult")
+      model.SDM.imp <- impacts(model.sdm, tr = trMat, R = 2000)
+      summary(model.SDM.imp, zstats = TRUE, short = TRUE)
+      other.sdm[i, 9]<-model.SDM.imp$res$direct # direct
+      other.sdm[i,10]<-model.SDM.imp$res$indirect # indirect
+      other.sdm[i,11]<-model.SDM.imp$res$total # total
+      
       # saving partial results
       other.sdm[i,1]<-AIC(model.sdm) # AIC.sdm
       other.sdm[i,2]<-BIC(model.sdm) # BIC.sdm
@@ -141,6 +152,12 @@ for(n in 1:3){
       other.sdm[i,6]<-nrow(datax) # how many observations in a sample
       other.sdm[i,7]<-seed[s] # seed used for simulation
       other.sdm[i,8]<-moran.test(datax$roa, pkt.k.sym.listw)$estimate[1] # Moran statistic
+      
+      #making SEM model
+      model.sem<-errorsarlm(eq, data=datax, pkt.k.sym.listw,zero.policy=TRUE)
+      other.sdm[i,12] <- AIC(model.sem) 
+      other.sdm[i,13] <- BIC(model.sem) 
+      other.sdm[i,14] <- model.sem$lambda
     }
     
     # merging partial results with general results table
